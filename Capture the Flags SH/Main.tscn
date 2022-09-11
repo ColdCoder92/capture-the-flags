@@ -1,0 +1,100 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://Item.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Player1.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HUD.tscn" type="PackedScene" id=4]
+[ext_resource path="res://art/House In a Forest Loop.ogg" type="AudioStream" id=5]
+[ext_resource path="res://art/gameover.wav" type="AudioStream" id=6]
+[ext_resource path="res://Player2.tscn" type="PackedScene" id=7]
+[ext_resource path="res://art/flag-1.png" type="Texture" id=8]
+[ext_resource path="res://art/flag-2.png" type="Texture" id=9]
+[ext_resource path="res://Item.gd" type="Script" id=10]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 8 ), ExtResource( 9 ) ],
+"loop": true,
+"name": "dance",
+"speed": 5.0
+}, {
+"frames": [  ],
+"loop": true,
+"name": "flip",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=2]
+
+[sub_resource type="Curve2D" id=3]
+_data = {
+"points": PoolVector2Array( 0, 0, 0, 0, 48, 84, 0, 0, 0, 0, 658, 86, 0, 0, 0, 0, 663, 646, 0, 0, 0, 0, 50, 646, 0, 0, 0, 0, 48, 84, 0, 0, 0, 0, 193, 162, 0, 0, 0, 0, 508, 209, 0, 0, 0, 0, 593, 154, 0, 0, 0, 0, 544, 349, 0, 0, 0, 0, 603, 515, 0, 0, 0, 0, 525, 583, 0, 0, 0, 0, 359, 504, 0, 0, 0, 0, 200, 587, 0, 0, 0, 0, 113, 511, 0, 0, 0, 0, 193, 366, 0, 0, 0, 0, 85, 296, 0, 0, 0, 0, 121, 215, 0, 0, 0, 0, 236, 209, 0, 0, 0, 0, 367, 143, 0, 0, 0, 0, 363, 281, 0, 0, 0, 0, 285, 334, 0, 0, 0, 0, 370, 400, 0, 0, 0, 0, 453, 339, 0, 0, 0, 0, 48, 84 )
+}
+
+[node name="Main" type="Node"]
+script = ExtResource( 1 )
+item_scene = ExtResource( 2 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_left = -0.254
+anchor_right = 1.29
+anchor_bottom = 1.0
+margin_left = -6.07999
+margin_right = -0.200012
+color = Color( 0.219608, 0.372549, 0.380392, 1 )
+
+[node name="ItemTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="GameTimer" type="Timer" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="Player1" parent="." instance=ExtResource( 3 )]
+
+[node name="Player2" parent="." instance=ExtResource( 7 )]
+position = Vector2( 720, 0 )
+
+[node name="StartPosition1" type="Position2D" parent="."]
+position = Vector2( 240, 450 )
+
+[node name="StartPosition2" type="Position2D" parent="."]
+position = Vector2( 480, 450 )
+
+[node name="HUD" parent="." instance=ExtResource( 4 )]
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
+
+[node name="Item" type="RigidBody2D" parent="."]
+position = Vector2( 0, 100 )
+scale = Vector2( 0.5, 0.5 )
+script = ExtResource( 10 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="Item"]
+frames = SubResource( 1 )
+animation = "flip"
+
+[node name="FlagCollision" type="CollisionShape2D" parent="Item"]
+shape = SubResource( 2 )
+
+[node name="ItemSpawn" type="Path2D" parent="."]
+curve = SubResource( 3 )
+
+[node name="SpawnPath" type="PathFollow2D" parent="ItemSpawn"]
+position = Vector2( 48, 84 )
+rotation = 0.00327716
+
+[connection signal="timeout" from="ItemTimer" to="." method="_on_ItemTimer_timeout"]
+[connection signal="timeout" from="GameTimer" to="." method="_on_GameTimer_timeout"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_StartTimer_timeout"]
+[connection signal="area_entered" from="Player1" to="." method="_on_Player1_area_entered"]
+[connection signal="body_entered" from="Player1" to="." method="_on_Player1_body_entered"]
+[connection signal="area_entered" from="Player2" to="." method="_on_Player2_area_entered"]
+[connection signal="body_entered" from="Player2" to="." method="_on_Player2_body_entered"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
